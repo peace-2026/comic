@@ -1,20 +1,8 @@
 [
   {
     "id": "first-light",
-    "title": "灯塔亮起的时候",
-    "desc": "关于一些会被记住的小瞬间",
+    "title": "星球漫画｜去太空",
+    "desc": "马斯克看了都羡慕",
     "cover": "content/comic/first-light/images/cover.png"
-  },
-  {
-    "id": "gym-days",
-    "title": "健身房小剧场",
-    "desc": "训练、玩笑和一点点日常",
-    "cover": "content/comic/gym-days/images/cover.png"
-  },
-  {
-    "id": "orange-cat",
-    "title": "小橘猫日记",
-    "desc": "一只小橘猫的奇怪冒险",
-    "cover": "content/comic/orange-cat/images/cover.png"
   }
 ]
