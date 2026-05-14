@@ -1,1 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>漫画详情</title>
+    <style>
+        /* 核心变量定义 */
+        :root {
+            --bg-color: #FDF7E8; /* 奶杏色背景 */
+            --text-color: #3A4A35; /* 深绿色文字 */
+            --card-bg: #FFFFFF; /* 奶白色卡片 */
+            --btn-bg: #F5EDD6; /* 比底色稍深的奶黄色 */
+            --btn-border: #EADFBF; /* 按钮边框色 */
+            --btn-disabled-bg: #EAE3D2;
+            --btn-disabled-text: #A6B0A2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg-color);
+        }
+
+        /* 顶部导航 */
+        header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn {
+            color: #7A8B76; 
+            text-decoration: none;
+            font-size: 14px; /* 字号减小 */
+            font-weight: normal; /* 不加粗 */
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .back-btn:active {
+            opacity: 0.6;
+        }
+
+        /* 主体内容区 */
+        .main-content {
+            flex: 1;
+            padding: 0 24px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 漫画卡片 */
+        .comic-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(58, 74, 53, 0.06); 
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .comic-card.fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comic-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* 底部导航按钮 */
+        .bottom-nav {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 0; /* 按钮缩小 */
+            border-radius: 100px;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-bg); /* 奶黄色背景 */
+            color: var(--text-color);
+            font-size: 14px; /* 字号减小 */
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: scale(0.97);
+            filter: brightness(0.95);
+        }
+
+        .nav-btn:disabled {
+            border-color: transparent;
+            background-color: var(--btn-disabled-bg);
+            color: var(--btn-disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 状态提示 */
+        .loading-state {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="#" id="back-link" class="back-btn">← 返回</a>
+    </header>
+
+    <div class="main-content">
+        <div id="loading-container" class="loading-state">
+            翻开手账中...
+        </div>
+
+        <div class="comic-card" id="comic-card" style="display: none;">
+            <div class="image-container">
+                <img src="" alt="漫画图片" class="comic-image" id="comic-image">
+            </div>
+        </div>
+
+        <div class="bottom-nav" id="bottom-nav" style="display: none;">
+            <button class="nav-btn" id="btn-prev" disabled>上一张</button>
+            <button class="nav-btn" id="btn-next">下一张</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const App = {
+        data: {
+            pages: [],
+            currentIndex: 0,
+            sectionId: ''
+        },
+        elements: {
+            backLink: document.getElementById('back-link'),
+            comicCard: document.getElementById('comic-card'),
+            comicImage: document.getElementById('comic-image'),
+            btnPrev: document.getElementById('btn-prev'),
+            btnNext: document.getElementById('btn-next'),
+            loadingContainer: document.getElementById('loading-container'),
+            bottomNav: document.getElementById('bottom-nav')
+        },
+
+        init() {
+            this.bindEvents();
+            this.loadComicData();
+        },
+
+        bindEvents() {
+            this.elements.btnPrev.addEventListener('click', () => this.navigate(-1));
+            this.elements.btnNext.addEventListener('click', () => this.navigate(1));
+        },
+
+        async loadComicData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.data.sectionId = urlParams.get('section') || 'default-section';
+            const file = urlParams.get('file') || '001.md';
+
+            this.elements.backLink.href = `comic-section.html?id=${this.data.sectionId}`;
+
+            const targetUrl = `content/comic/${this.data.sectionId}/${file}`;
+
+            try {
+                const response = await fetch(targetUrl);
+                if (!response.ok) throw new Error();
+                const markdownText = await response.text();
+                this.parseMarkdown(markdownText);
+            } catch (error) {
+                this.parseMarkdown(this.getMockMarkdown());
+            }
+        },
+
+        parseMarkdown(markdown) {
+            let contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, '');
+            const rawSections = contentWithoutTitle.split(/\n---\n/);
+            this.data.pages = [];
+
+            rawSections.forEach(section => {
+                const imgRegex = /!\[.*?\]\((.*?)\)/;
+                const imgMatch = section.match(imgRegex);
+                if (imgMatch) {
+                    this.data.pages.push({ image: imgMatch[1] });
+                }
+            });
+
+            this.hideLoading();
+            if (this.data.pages.length > 0) {
+                this.renderPage(0);
+            }
+        },
+
+        renderPage(index) {
+            if (index < 0 || index >= this.data.pages.length) return;
+            this.data.currentIndex = index;
+            const currentPage = this.data.pages[index];
+
+            this.elements.comicCard.classList.remove('fade-in');
+            void this.elements.comicCard.offsetWidth;
+
+            this.elements.comicImage.src = currentPage.image;
+            this.elements.comicCard.classList.add('fade-in');
+
+            this.updateButtons();
+        },
+
+        updateButtons() {
+            const index = this.data.currentIndex;
+            const total = this.data.pages.length;
+            this.elements.btnPrev.disabled = index === 0;
+            this.elements.btnNext.textContent = (index === total - 1) ? '看完啦' : '下一张';
+        },
+
+        navigate(direction) {
+            const nextIndex = this.data.currentIndex + direction;
+            if (nextIndex >= 0 && nextIndex < this.data.pages.length) {
+                this.renderPage(nextIndex);
+            } else if (nextIndex === this.data.pages.length) {
+                window.location.href = this.elements.backLink.href;
+            }
+        },
+
+        hideLoading() {
+            this.elements.loadingContainer.style.display = 'none';
+            this.elements.comicCard.style.display = 'flex';
+            this.elements.bottomNav.style.display = 'flex';
+        },
+
+        getMockMarkdown() {
+            return `# 演示内容
+![P1](https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80)
+---
+![P2](https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80)
+---
+![P3](https://images.unsplash.com/photo-1495562569060-2eec283d3391?auto=format&fit=crop&w=800&q=80)`;
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
 
