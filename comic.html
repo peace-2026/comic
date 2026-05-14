@@ -1,1 +1,139 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comic - 小雨彤的小站</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: #fff7ef;
+      color: #2f2a26;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .back {
+      color: #9b7b63;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    h1 {
+      margin: 24px 0 8px;
+      font-size: 32px;
+    }
+
+    .desc {
+      color: #8a7667;
+      margin-bottom: 28px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      display: block;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(120, 90, 60, 0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 10px 24px rgba(120, 90, 60, 0.08);
+      transition: 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(120, 90, 60, 0.14);
+    }
+
+    .cover {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #ffd7ba, #ffe6f1);
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #8a7667;
+      line-height: 1.6;
+    }
+
+    .empty {
+      color: #8a7667;
+      padding: 24px;
+      background: rgba(255,255,255,.7);
+      border-radius: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a class="back" href="index.html">← 返回首页</a>
+
+    <h1>Comic</h1>
+    <div class="desc">这里放连环画，不同主题可以慢慢长出来。</div>
+
+    <section class="grid" id="comicGrid"></section>
+  </main>
+
+  <script>
+    async function loadComics() {
+      const grid = document.getElementById('comicGrid');
+
+      try {
+        const res = await fetch('data/comic-sections.json');
+        if (!res.ok) throw new Error('找不到 comic-sections.json');
+
+        const list = await res.json();
+
+        if (!list.length) {
+          grid.innerHTML = '<div class="empty">还没有漫画系列。</div>';
+          return;
+        }
+
+        grid.innerHTML = list.map(item => `
+          <a class="card" href="comic-section.html?id=${item.id}">
+            <img class="cover" src="${item.cover || 'assets/images/default-cover.png'}" alt="${item.title}">
+            <div class="card-body">
+              <div class="card-title">${item.title}</div>
+              <div class="card-desc">${item.desc || ''}</div>
+            </div>
+          </a>
+        `).join('');
+
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="empty">
+            没有读取到漫画目录。请检查：data/comic-sections.json
+          </div>
+        `;
+      }
+    }
+
+    loadComics();
+  </script>
+</body>
+</html>
