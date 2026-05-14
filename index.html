@@ -1,1 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
+  <title>星球漫画</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-color: #FDF7E8;
+      --card-bg: #FFFFFF;
+
+      --text-main: #3A4A35;
+      --text-sub: #7A8B74;
+      --text-desc: #9B988A;
+
+      --icon-bg-1: #E8F0E1;
+      --icon-bg-2: #FFF2D1;
+
+      --shadow-soft: 0 8px 24px rgba(138, 154, 134, 0.12);
+
+      --divider-color: #F0F0F0;
+    }
+
+    body {
+      font-family:
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        sans-serif;
+
+      background-color: var(--bg-color);
+      color: var(--text-main);
+
+      min-height: 100vh;
+
+      display: flex;
+      justify-content: center;
+
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 420px;
+
+      min-height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      padding: 24px 20px 40px;
+
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ===== 背景装饰 ===== */
+
+    .decorations {
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .deco-item {
+      position: absolute;
+      animation: float-deco 6s ease-in-out infinite;
+    }
+
+    @keyframes float-deco {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(2deg);
+      }
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+
+      background-color: #FFDE8A;
+
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    .dot-1 {
+      top: 12%;
+      right: 15%;
+    }
+
+    .dot-2 {
+      top: 40%;
+      left: 10%;
+
+      background-color: #C6D7BD;
+
+      width: 6px;
+      height: 6px;
+
+      animation-delay: 1s;
+    }
+
+    .cross {
+      width: 12px;
+      height: 12px;
+
+      opacity: 0.5;
+
+      top: 70%;
+      right: 12%;
+
+      animation-delay: 0.5s;
+    }
+
+    .cross::before,
+    .cross::after {
+      content: '';
+
+      position: absolute;
+
+      background-color: #E2AD88;
+    }
+
+    .cross::before {
+      top: 5px;
+      left: 0;
+
+      width: 12px;
+      height: 2px;
+    }
+
+    .cross::after {
+      top: 0;
+      left: 5px;
+
+      width: 2px;
+      height: 12px;
+    }
+
+    /* ===== 动画 ===== */
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== 顶部 ===== */
+
+    .top-section {
+      animation: fadeIn 1.2s ease-out forwards;
+
+      margin-bottom: 40px;
+
+      text-align: center;
+    }
+
+    .greeting-title {
+      font-size: 34px;
+      font-weight: 800;
+
+      color: var(--text-main);
+
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .greeting-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+
+      line-height: 1.8;
+    }
+
+    /* ===== 中间功能区 ===== */
+
+    .middle-section {
+      animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+      animation-delay: 0.2s;
+
+      opacity: 0;
+
+      margin-bottom: 40px;
+    }
+
+    .action-card {
+      background-color: var(--card-bg);
+
+      border-radius: 28px;
+
+      box-shadow: var(--shadow-soft);
+
+      display: flex;
+      align-items: center;
+
+      padding: 24px 0;
+
+      position: relative;
+    }
+
+    .action-btn {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      cursor: pointer;
+
+      transition: all 0.3s ease;
+    }
+
+    .btn-divider {
+      width: 1px;
+      height: 60px;
+
+      background-color: var(--divider-color);
+    }
+
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+
+      border-radius: 50%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      margin-bottom: 12px;
+
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .action-btn:first-child .icon-circle {
+      background-color: var(--icon-bg-1);
+    }
+
+    .action-btn:last-child .icon-circle {
+      background-color: var(--icon-bg-2);
+    }
+
+    .icon-circle svg {
+      width: 28px;
+      height: 28px;
+
+      stroke: var(--text-main);
+      stroke-width: 2;
+
+      fill: none;
+
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .action-title {
+      font-size: 16px;
+      font-weight: 600;
+
+      color: var(--text-main);
+
+      margin-bottom: 4px;
+    }
+
+    .action-en {
+      font-size: 11px;
+
+      color: var(--text-sub);
+
+      letter-spacing: 0.5px;
+
+      opacity: 0.8;
+
+      font-family: Arial, sans-serif;
+    }
+
+    .action-btn:active .icon-circle {
+      transform: scale(0.9);
+    }
+
+    .action-btn:active {
+      opacity: 0.8;
+    }
+
+    /* ===== 底部文字 ===== */
+
+    .bottom-text {
+      text-align: center;
+
+      animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+      animation-delay: 0.4s;
+
+      opacity: 0;
+
+      padding: 0 10px;
+    }
+
+    .desc-title {
+      font-size: 14px;
+      font-weight: 600;
+
+      color: var(--text-sub);
+
+      margin-bottom: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 8px;
+    }
+
+    .desc-title::before,
+    .desc-title::after {
+      content: '✦';
+
+      font-size: 10px;
+
+      color: #D3DABF;
+    }
+
+    .desc-body {
+      font-size: 13px;
+      line-height: 1.8;
+
+      color: var(--text-desc);
+    }
+
+    /* ===== 手机优化 ===== */
+
+    @media (max-width: 480px) {
+      .greeting-title {
+        font-size: 30px;
+      }
+
+      .action-card {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 背景装饰 -->
+  <div class="decorations">
+    <div class="deco-item dot dot-1"></div>
+    <div class="deco-item dot dot-2"></div>
+    <div class="deco-item cross"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- 顶部 -->
+    <header class="top-section">
+      <h1 class="greeting-title" id="greeting-text">你好</h1>
+
+      <div class="greeting-sub">
+        一个慢慢更新的小角落
+      </div>
+    </header>
+
+    <!-- 功能区 -->
+    <main class="middle-section">
+
+      <div class="action-card">
+
+        <!-- 连环画 -->
+
+        <div
+          class="action-btn"
+          onclick="window.location.href='comic.html'"
+        >
+          <div class="icon-circle">
+
+            <svg viewBox="0 0 24 24">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+
+          </div>
+
+          <div class="action-title">
+            连环画
+          </div>
+
+          <div class="action-en">
+            COMICS
+          </div>
+        </div>
+
+        <div class="btn-divider"></div>
+
+        <!-- 番外 -->
+
+        <div
+          class="action-btn"
+          onclick="window.location.href='extra.html'"
+        >
+          <div class="icon-circle">
+
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3v18"/>
+              <path d="M3 12h18"/>
+              <path d="m5 5 14 14"/>
+              <path d="m19 5-14 14"/>
+            </svg>
+
+          </div>
+
+          <div class="action-title">
+            番外不定期
+          </div>
+
+          <div class="action-en">
+            EXTRAS
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- 底部 -->
+
+    <section class="bottom-text">
+
+      <div class="desc-title">
+        想到什么就更新一点
+      </div>
+
+      <p class="desc-body">
+        这里会慢慢放一些连环画、番外和偶尔掉落的小内容。<br>
+        不用急，也不用一次看完。
+      </p>
+
+    </section>
+
+  </div>
+
+  <script>
+
+    function updateGreeting() {
+
+      const hour = new Date().getHours();
+
+      const greetingElement =
+        document.getElementById('greeting-text');
+
+      if (hour >= 0 && hour < 12) {
+
+        greetingElement.textContent = '上午好';
+
+      } else if (hour >= 12 && hour < 18) {
+
+        greetingElement.textContent = '下午好';
+
+      } else {
+
+        greetingElement.textContent = '晚上好';
+
+      }
+    }
+
+    document
+      .querySelectorAll('.action-btn')
+      .forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+          const iconCircle =
+            this.querySelector('.icon-circle');
+
+          iconCircle.style.transform = 'scale(1.15)';
+
+          setTimeout(() => {
+            iconCircle.style.transform = '';
+          }, 200);
+
+        });
+
+      });
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      updateGreeting
+    );
+
+  </script>
+
+</body>
+</html>
