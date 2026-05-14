@@ -2,53 +2,172 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extra - 星球漫画</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>番外 - 星球漫画</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-color: #FDF7E8;
+      --card-bg: #FFFFFF;
+      --text-main: #3A4A35;
+      --text-sub: #7A8B74;
+      --text-desc: #9B988A;
+      --icon-bg: #FFF2D1;
+      --shadow-soft: 0 8px 24px rgba(138, 154, 134, 0.12);
+      --border-soft: rgba(138, 154, 134, 0.14);
+    }
+
     body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    .decorations {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
 
-  background-color: var(--bg-color);
+    .deco-item {
+      position: absolute;
+      animation: float-deco 6s ease-in-out infinite;
+    }
 
-  color: var(--text-main);
+    @keyframes float-deco {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
 
-  min-height: 100vh;
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #FFDE8A;
+      border-radius: 50%;
+      opacity: 0.6;
+    }
 
-  overflow-x: hidden;
+    .dot-1 { top: 12%; right: 15%; }
 
-  position: relative;
+    .dot-2 {
+      top: 40%;
+      left: 10%;
+      background-color: #C6D7BD;
+      width: 6px;
+      height: 6px;
+      animation-delay: 1s;
+    }
 
-}
+    .cross {
+      width: 12px;
+      height: 12px;
+      opacity: 0.5;
+      top: 70%;
+      right: 12%;
+      animation-delay: 0.5s;
+    }
+
+    .cross::before,
+    .cross::after {
+      content: '';
+      position: absolute;
+      background-color: #E2AD88;
+    }
+
+    .cross::before {
+      top: 5px;
+      left: 0;
+      width: 12px;
+      height: 2px;
+    }
+
+    .cross::after {
+      top: 0;
+      left: 5px;
+      width: 2px;
+      height: 12px;
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .page {
-
-  width: 100%;
-
-  max-width: 420px;
-
-  min-height: 100vh;
-
-  margin: 0 auto;
-
-  padding: 32px 20px 60px;
-
-}
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+      position: relative;
+      z-index: 10;
+      animation: slideUpFade 0.8s ease forwards;
+    }
 
     .back {
-      color: #9b7b63;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-sub);
       text-decoration: none;
       font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 30px;
     }
 
     h1 {
-      margin: 24px 0 8px;
       font-size: 32px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
     }
 
     .desc {
-      color: #8a7667;
-      margin-bottom: 28px;
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.8;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: '✦';
+      font-size: 10px;
+      color: #D3DABF;
     }
 
     .list {
@@ -58,47 +177,102 @@
     }
 
     .item {
-      display: block;
-      padding: 18px 20px;
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(120, 90, 60, 0.12);
-      border-radius: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 16px;
       text-decoration: none;
       color: inherit;
-      box-shadow: 0 8px 20px rgba(120, 90, 60, 0.07);
-      transition: 0.25s ease;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.25s ease;
     }
 
-    .item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 14px 28px rgba(120, 90, 60, 0.13);
+    .item:active {
+      transform: scale(0.98);
+      opacity: 0.86;
+    }
+
+    .item-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #FFF2D1, #E8F0E1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--text-main);
+    }
+
+    .item-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .item-body {
+      min-width: 0;
+      flex: 1;
     }
 
     .item-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
+      color: var(--text-main);
       margin-bottom: 6px;
+      line-height: 1.4;
     }
 
     .item-date {
       font-size: 13px;
-      color: #9b7b63;
+      color: var(--text-desc);
     }
 
     .empty {
-      color: #8a7667;
+      color: var(--text-desc);
       padding: 24px;
-      background: rgba(255,255,255,.7);
-      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+      line-height: 1.7;
+    }
+
+    @media (min-width: 421px) {
+      .page {
+        padding-top: 40px;
+      }
+
+      .item:hover {
+        transform: translateY(-3px);
+      }
     }
   </style>
 </head>
+
 <body>
+  <div class="decorations">
+    <div class="deco-item dot dot-1"></div>
+    <div class="deco-item dot dot-2"></div>
+    <div class="deco-item cross"></div>
+  </div>
+
   <main class="page">
     <a class="back" href="index.html">← 返回首页</a>
 
-    <h1>Extra</h1>
-    <div class="desc">这里放不定期更新的小番外。</div>
+    <header class="page-header">
+      <h1>番外</h1>
+      <div class="desc">不定期掉落的小片段、小故事和小心情。</div>
+    </header>
+
+    <div class="section-title">最近更新</div>
 
     <section class="list" id="extraList"></section>
   </main>
@@ -134,15 +308,27 @@
 
         listBox.innerHTML = items.map(item => `
           <a class="item" href="extra-detail.html?file=${encodeURIComponent(item.file)}">
-            <div class="item-title">${item.title}</div>
-            <div class="item-date">${item.date}</div>
+            <div class="item-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3v18"></path>
+                <path d="M3 12h18"></path>
+                <path d="m5 5 14 14"></path>
+                <path d="m19 5-14 14"></path>
+              </svg>
+            </div>
+
+            <div class="item-body">
+              <div class="item-title">${item.title}</div>
+              <div class="item-date">${item.date}</div>
+            </div>
           </a>
         `).join('');
 
       } catch (err) {
         listBox.innerHTML = `
           <div class="empty">
-            没有读取到番外目录。请检查：content/extra/index.json
+            没有读取到番外目录。<br>
+            请检查 content/extra/index.json
           </div>
         `;
       }
