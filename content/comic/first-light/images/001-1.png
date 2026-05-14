@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>漫画列表</title>
+</head>
+<body>
+  <h1>漫画列表</h1>
 
+  <div id="list">加载中...</div>
+
+  <script>
+    async function loadList() {
+      const params = new URLSearchParams(window.location.search);
+      const section = params.get('id') || 'first-light';
+
+      const res = await fetch(`content/comic/${section}/index.json`);
+      const files = await res.json();
+
+      document.getElementById('list').innerHTML = files.map(file => `
+        <p>
+          <a href="comic-detail.html?section=${section}&file=${file}">
+            ${file}
+          </a>
+        </p>
+      `).join('');
+    }
+
+    loadList();
+  </script>
+</body>
+</html>
