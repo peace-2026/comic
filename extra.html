@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extra - 小雨彤的小站</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: #fff7ef;
+      color: #2f2a26;
+    }
 
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .back {
+      color: #9b7b63;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    h1 {
+      margin: 24px 0 8px;
+      font-size: 32px;
+    }
+
+    .desc {
+      color: #8a7667;
+      margin-bottom: 28px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .item {
+      display: block;
+      padding: 18px 20px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(120, 90, 60, 0.12);
+      border-radius: 18px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 8px 20px rgba(120, 90, 60, 0.07);
+      transition: 0.25s ease;
+    }
+
+    .item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(120, 90, 60, 0.13);
+    }
+
+    .item-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .item-date {
+      font-size: 13px;
+      color: #9b7b63;
+    }
+
+    .empty {
+      color: #8a7667;
+      padding: 24px;
+      background: rgba(255,255,255,.7);
+      border-radius: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a class="back" href="index.html">← 返回首页</a>
+
+    <h1>Extra</h1>
+    <div class="desc">这里放不定期更新的小番外。</div>
+
+    <section class="list" id="extraList"></section>
+  </main>
+
+  <script>
+    function getTitleFromMarkdown(text, fallback) {
+      const match = text.match(/^#\\s+(.+)$/m);
+      return match ? match[1].trim() : fallback.replace('.md', '');
+    }
+
+    async function loadExtras() {
+      const listBox = document.getElementById('extraList');
+
+      try {
+        const res = await fetch('content/extra/index.json');
+        if (!res.ok) throw new Error('找不到 extra/index.json');
+
+        const files = await res.json();
+
+        if (!files.length) {
+          listBox.innerHTML = '<div class="empty">还没有番外。</div>';
+          return;
+        }
+
+        const items = await Promise.all(files.map(async file => {
+          const mdRes = await fetch(`content/extra/${file}`);
+          const mdText = mdRes.ok ? await mdRes.text() : '';
+          const title = getTitleFromMarkdown(mdText, file);
+          const date = file.replace('.md', '');
+
+          return { file, title, date };
+        }));
+
+        listBox.innerHTML = items.map(item => `
+          <a class="item" href="extra-detail.html?file=${encodeURIComponent(item.file)}">
+            <div class="item-title">${item.title}</div>
+            <div class="item-date">${item.date}</div>
+          </a>
+        `).join('');
+
+      } catch (err) {
+        listBox.innerHTML = `
+          <div class="empty">
+            没有读取到番外目录。请检查：content/extra/index.json
+          </div>
+        `;
+      }
+    }
+
+    loadExtras();
+  </script>
+</body>
+</html>
