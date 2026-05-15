@@ -53,8 +53,8 @@
         .back-btn {
             color: #7A8B76; 
             text-decoration: none;
-            font-size: 14px; /* 字号减小 */
-            font-weight: normal; /* 不加粗 */
+            font-size: 14px;
+            font-weight: normal;
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -97,6 +97,16 @@
             }
         }
 
+        /* 页码 */
+        .page-number {
+            text-align: center;
+            padding: 14px 0 10px;
+            font-size: 14px;
+            color: #7A8B76;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
         .image-container {
             width: 100%;
             display: flex;
@@ -121,12 +131,12 @@
 
         .nav-btn {
             flex: 1;
-            padding: 10px 0; /* 按钮缩小 */
+            padding: 10px 0;
             border-radius: 100px;
             border: 1px solid var(--btn-border);
-            background-color: var(--btn-bg); /* 奶黄色背景 */
+            background-color: var(--btn-bg);
             color: var(--text-color);
-            font-size: 14px; /* 字号减小 */
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -170,6 +180,8 @@
         </div>
 
         <div class="comic-card" id="comic-card" style="display: none;">
+            <div class="page-number" id="page-number"></div>
+
             <div class="image-container">
                 <img src="" alt="漫画图片" class="comic-image" id="comic-image">
             </div>
@@ -193,6 +205,7 @@
             backLink: document.getElementById('back-link'),
             comicCard: document.getElementById('comic-card'),
             comicImage: document.getElementById('comic-image'),
+            pageNumber: document.getElementById('page-number'),
             btnPrev: document.getElementById('btn-prev'),
             btnNext: document.getElementById('btn-next'),
             loadingContainer: document.getElementById('loading-container'),
@@ -229,43 +242,44 @@
         },
 
         parseMarkdown(markdown) {
-    const basePath = `content/comic/${this.data.sectionId}/`;
+            const basePath = `content/comic/${this.data.sectionId}/`;
 
-    let contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, '').trim();
+            let contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, '').trim();
 
-    const rawSections = contentWithoutTitle
-        .split(/\n---\n/)
-        .map(item => item.trim())
-        .filter(item => item.includes('!['));
+            const rawSections = contentWithoutTitle
+                .split(/\n---\n/)
+                .map(item => item.trim())
+                .filter(item => item.includes('!['));
 
-    this.data.pages = [];
+            this.data.pages = [];
 
-    rawSections.forEach(section => {
-        const imgRegex = /!\[.*?\]\((.*?)\)/;
-        const imgMatch = section.match(imgRegex);
+            rawSections.forEach(section => {
+                const imgRegex = /!\[.*?\]\((.*?)\)/;
+                const imgMatch = section.match(imgRegex);
 
-        if (imgMatch) {
-            let imagePath = imgMatch[1].trim();
+                if (imgMatch) {
+                    let imagePath = imgMatch[1].trim();
 
-            if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-                imagePath = basePath + imagePath;
-            }
+                    if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+                        imagePath = basePath + imagePath;
+                    }
 
-            this.data.pages.push({
-                image: imagePath
+                    this.data.pages.push({
+                        image: imagePath
+                    });
+                }
             });
-        }
-    });
 
-    this.hideLoading();
+            this.hideLoading();
 
-    if (this.data.pages.length > 0) {
-        this.renderPage(0);
-    }
-},
+            if (this.data.pages.length > 0) {
+                this.renderPage(0);
+            }
+        },
 
         renderPage(index) {
             if (index < 0 || index >= this.data.pages.length) return;
+
             this.data.currentIndex = index;
             const currentPage = this.data.pages[index];
 
@@ -273,6 +287,7 @@
             void this.elements.comicCard.offsetWidth;
 
             this.elements.comicImage.src = currentPage.image;
+            this.elements.pageNumber.textContent = `${index + 1}/${this.data.pages.length}`;
             this.elements.comicCard.classList.add('fade-in');
 
             this.updateButtons();
@@ -281,19 +296,19 @@
         updateButtons() {
             const index = this.data.currentIndex;
             const total = this.data.pages.length;
+
             this.elements.btnPrev.disabled = index === 0;
             this.elements.btnNext.textContent = (index === total - 1) ? '看完啦' : '下一张';
         },
 
         navigate(direction) {
             const nextIndex = this.data.currentIndex + direction;
+
             if (nextIndex >= 0 && nextIndex < this.data.pages.length) {
                 this.renderPage(nextIndex);
             } else if (nextIndex === this.data.pages.length) {
-
-window.location.href = 'comic.html';
-
-}
+                window.location.href = 'comic.html';
+            }
         },
 
         hideLoading() {
@@ -316,4 +331,3 @@ window.location.href = 'comic.html';
 </script>
 </body>
 </html>
-
