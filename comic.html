@@ -19,7 +19,6 @@
       --text-main: #3A4A35;
       --text-sub: #7A8B74;
       --text-desc: #9B988A;
-      --icon-bg: #E8F0E1;
       --shadow-soft: 0 8px 24px rgba(138, 154, 134, 0.12);
       --border-soft: rgba(138, 154, 134, 0.14);
     }
@@ -47,8 +46,13 @@
     }
 
     @keyframes float-deco {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(2deg);
+      }
     }
 
     .dot {
@@ -59,7 +63,11 @@
       opacity: 0.6;
     }
 
-    .dot-1 { top: 12%; right: 15%; }
+    .dot-1 {
+      top: 12%;
+      right: 15%;
+    }
+
     .dot-2 {
       top: 40%;
       left: 10%;
@@ -80,7 +88,7 @@
 
     .cross::before,
     .cross::after {
-      content: '';
+      content: "";
       position: absolute;
       background-color: #E2AD88;
     }
@@ -104,6 +112,7 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -150,6 +159,24 @@
       line-height: 1.8;
     }
 
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: "✦";
+      font-size: 10px;
+      color: #D3DABF;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -168,6 +195,7 @@
       color: inherit;
       box-shadow: var(--shadow-soft);
       transition: all 0.25s ease;
+      cursor: pointer;
     }
 
     .card:active {
@@ -217,24 +245,6 @@
       line-height: 1.7;
     }
 
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-sub);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .section-title::before,
-    .section-title::after {
-      content: '✦';
-      font-size: 10px;
-      color: #D3DABF;
-    }
-
     @media (min-width: 421px) {
       .page {
         padding-top: 40px;
@@ -268,12 +278,36 @@
   </main>
 
   <script>
+    async function openFirstComic(sectionId) {
+      try {
+        const res = await fetch(`content/comic/${sectionId}/index.json`);
+
+        if (!res.ok) {
+          throw new Error("找不到 index.json");
+        }
+
+        const files = await res.json();
+
+        if (!files.length) {
+          alert("这个系列还没有内容");
+          return;
+        }
+
+        window.location.href = `comic-detail.html?section=${sectionId}&file=${files[0]}`;
+      } catch (err) {
+        alert("没有读取到这个漫画系列");
+      }
+    }
+
     async function loadComics() {
-      const grid = document.getElementById('comicGrid');
+      const grid = document.getElementById("comicGrid");
 
       try {
-        const res = await fetch('data/comic-sections.json');
-        if (!res.ok) throw new Error('找不到 comic-sections.json');
+        const res = await fetch("data/comic-sections.json");
+
+        if (!res.ok) {
+          throw new Error("找不到 comic-sections.json");
+        }
 
         const list = await res.json();
 
@@ -283,15 +317,18 @@
         }
 
         grid.innerHTML = list.map(item => `
-          <a class="card" href="comic-section.html?id=${item.id}">
-            <img class="cover" src="${item.cover || 'assets/images/default-cover.png'}" alt="${item.title}">
+          <a class="card" href="javascript:void(0)" onclick="openFirstComic('${item.id}')">
+            <img
+              class="cover"
+              src="${item.cover || "assets/images/default-cover.png"}"
+              alt="${item.title}"
+            >
             <div class="card-body">
               <div class="card-title">${item.title}</div>
-              <div class="card-desc">${item.desc || ''}</div>
+              <div class="card-desc">${item.desc || ""}</div>
             </div>
           </a>
-        `).join('');
-
+        `).join("");
       } catch (err) {
         grid.innerHTML = `
           <div class="empty">
