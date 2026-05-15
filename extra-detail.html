@@ -1,1 +1,320 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>番外详情</title>
+
+  <style>
+    :root {
+      --bg-color: #FDF7E8;
+      --text-color: #3A4A35;
+      --card-bg: #FFFFFF;
+      --btn-bg: #F5EDD6;
+      --btn-border: #EADFBF;
+      --btn-disabled-bg: #EAE3D2;
+      --btn-disabled-text: #A6B0A2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-color: var(--bg-color);
+    }
+
+    header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn {
+      color: #7A8B76;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: normal;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.2s;
+    }
+
+    .back-btn:active {
+      opacity: 0.6;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 0 24px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .extra-card {
+      background-color: var(--card-bg);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(58, 74, 53, 0.06);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .extra-card.fade-in {
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .image-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .extra-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .bottom-nav {
+      margin-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 100px;
+      border: 1px solid var(--btn-border);
+      background-color: var(--btn-bg);
+      color: var(--text-color);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      transform: scale(0.97);
+      filter: brightness(0.95);
+    }
+
+    .nav-btn:disabled {
+      border-color: transparent;
+      background-color: var(--btn-disabled-bg);
+      color: var(--btn-disabled-text);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 50px 20px;
+      font-size: 14px;
+      color: var(--text-color);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <a href="#" id="back-link" class="back-btn">← 返回</a>
+    </header>
+
+    <div class="main-content">
+      <div id="loading-container" class="loading-state">
+        翻开番外中...
+      </div>
+
+      <div class="extra-card" id="extra-card" style="display: none;">
+        <div class="image-container">
+          <img src="" alt="番外图片" class="extra-image" id="extra-image">
+        </div>
+      </div>
+
+      <div class="bottom-nav" id="bottom-nav" style="display: none;">
+        <button class="nav-btn" id="btn-prev" disabled>上一张</button>
+        <button class="nav-btn" id="btn-next">下一张</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const App = {
+      data: {
+        pages: [],
+        currentIndex: 0,
+        sectionId: ""
+      },
+
+      elements: {
+        backLink: document.getElementById("back-link"),
+        extraCard: document.getElementById("extra-card"),
+        extraImage: document.getElementById("extra-image"),
+        btnPrev: document.getElementById("btn-prev"),
+        btnNext: document.getElementById("btn-next"),
+        loadingContainer: document.getElementById("loading-container"),
+        bottomNav: document.getElementById("bottom-nav")
+      },
+
+      init() {
+        this.bindEvents();
+        this.loadExtraData();
+      },
+
+      bindEvents() {
+        this.elements.btnPrev.addEventListener("click", () => this.navigate(-1));
+        this.elements.btnNext.addEventListener("click", () => this.navigate(1));
+      },
+
+      async loadExtraData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        this.data.sectionId = urlParams.get("section") || "2026-05-10";
+        const file = urlParams.get("file") || "2026-05-10.md";
+
+        this.elements.backLink.href = "extra.html";
+
+        const targetUrl = `content/extra/${this.data.sectionId}/${file}`;
+
+        try {
+          const response = await fetch(targetUrl);
+          if (!response.ok) throw new Error("Markdown not found");
+
+          const markdownText = await response.text();
+          this.parseMarkdown(markdownText);
+        } catch (error) {
+          this.parseMarkdown(this.getMockMarkdown());
+        }
+      },
+
+      parseMarkdown(markdown) {
+        const basePath = `content/extra/${this.data.sectionId}/`;
+
+        const contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, "").trim();
+
+        const rawSections = contentWithoutTitle
+          .split(/\n---\n/)
+          .map(item => item.trim())
+          .filter(item => item.includes("!["));
+
+        this.data.pages = [];
+
+        rawSections.forEach(section => {
+          const imgRegex = /!\[.*?\]\((.*?)\)/;
+          const imgMatch = section.match(imgRegex);
+
+          if (imgMatch) {
+            let imagePath = imgMatch[1].trim();
+
+            if (!imagePath.startsWith("http") && !imagePath.startsWith("/")) {
+              imagePath = basePath + imagePath;
+            }
+
+            this.data.pages.push({
+              image: imagePath
+            });
+          }
+        });
+
+        this.hideLoading();
+
+        if (this.data.pages.length > 0) {
+          this.renderPage(0);
+        }
+      },
+
+      renderPage(index) {
+        if (index < 0 || index >= this.data.pages.length) return;
+
+        this.data.currentIndex = index;
+        const currentPage = this.data.pages[index];
+
+        this.elements.extraCard.classList.remove("fade-in");
+        void this.elements.extraCard.offsetWidth;
+
+        this.elements.extraImage.src = currentPage.image;
+        this.elements.extraCard.classList.add("fade-in");
+
+        this.updateButtons();
+      },
+
+      updateButtons() {
+        const index = this.data.currentIndex;
+        const total = this.data.pages.length;
+
+        this.elements.btnPrev.disabled = index === 0;
+        this.elements.btnNext.textContent = index === total - 1 ? "看完啦" : "下一张";
+      },
+
+      navigate(direction) {
+        const nextIndex = this.data.currentIndex + direction;
+
+        if (nextIndex >= 0 && nextIndex < this.data.pages.length) {
+          this.renderPage(nextIndex);
+        } else if (nextIndex === this.data.pages.length) {
+          window.location.href = "extra.html";
+        }
+      },
+
+      hideLoading() {
+        this.elements.loadingContainer.style.display = "none";
+        this.elements.extraCard.style.display = "flex";
+        this.elements.bottomNav.style.display = "flex";
+      },
+
+      getMockMarkdown() {
+        return `# 演示番外
+
+---
+
+![P1](https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80)
+
+---
+
+![P2](https://images.unsplash.com/photo-1494256997604-768d1f608cac?auto=format&fit=crop&w=800&q=80)`;
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => App.init());
+  </script>
+</body>
+</html>
