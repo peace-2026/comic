@@ -229,23 +229,40 @@
         },
 
         parseMarkdown(markdown) {
-            let contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, '');
-            const rawSections = contentWithoutTitle.split(/\n---\n/);
-            this.data.pages = [];
+    const basePath = `content/comic/${this.data.sectionId}/`;
 
-            rawSections.forEach(section => {
-                const imgRegex = /!\[.*?\]\((.*?)\)/;
-                const imgMatch = section.match(imgRegex);
-                if (imgMatch) {
-                    this.data.pages.push({ image: imgMatch[1] });
-                }
-            });
+    let contentWithoutTitle = markdown.replace(/^#\s+.+\n?/, '').trim();
 
-            this.hideLoading();
-            if (this.data.pages.length > 0) {
-                this.renderPage(0);
+    const rawSections = contentWithoutTitle
+        .split(/\n---\n/)
+        .map(item => item.trim())
+        .filter(item => item.includes('!['));
+
+    this.data.pages = [];
+
+    rawSections.forEach(section => {
+        const imgRegex = /!\[.*?\]\((.*?)\)/;
+        const imgMatch = section.match(imgRegex);
+
+        if (imgMatch) {
+            let imagePath = imgMatch[1].trim();
+
+            if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+                imagePath = basePath + imagePath;
             }
-        },
+
+            this.data.pages.push({
+                image: imagePath
+            });
+        }
+    });
+
+    this.hideLoading();
+
+    if (this.data.pages.length > 0) {
+        this.renderPage(0);
+    }
+},
 
         renderPage(index) {
             if (index < 0 || index >= this.data.pages.length) return;
