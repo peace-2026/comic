@@ -1,30 +1,158 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>漫画列表</title>
-</head>
-<body>
-  <h1>漫画列表</h1>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>漫画系列 - 星球漫画</title>
 
-  <div id="list">加载中...</div>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-color: #FDF7E8;
+      --card-bg: #FFFFFF;
+      --text-main: #3A4A35;
+      --text-sub: #7A8B74;
+      --text-desc: #9B988A;
+      --shadow-soft: 0 8px 24px rgba(138, 154, 134, 0.12);
+      --border-soft: rgba(138, 154, 134, 0.14);
+    }
+
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .back {
+      display: inline-block;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.8;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .item {
+      display: block;
+      background: var(--card-bg);
+      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-soft);
+      transition: 0.25s ease;
+    }
+
+    .item:active {
+      transform: scale(0.98);
+      opacity: 0.85;
+    }
+
+    .item-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .item-desc {
+      font-size: 13px;
+      color: var(--text-desc);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--text-desc);
+      background: rgba(255,255,255,.75);
+      padding: 24px;
+      border-radius: 20px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <a class="back" href="comic.html">← 返回连环画</a>
+
+    <header class="header">
+      <h1 id="seriesTitle">漫画列表</h1>
+      <div class="desc">选择一话开始阅读。</div>
+    </header>
+
+    <section class="list" id="list">
+      <div class="empty">加载中...</div>
+    </section>
+  </main>
 
   <script>
     async function loadList() {
       const params = new URLSearchParams(window.location.search);
       const section = params.get('id') || 'first-light';
+      const listBox = document.getElementById('list');
 
-      const res = await fetch(`content/comic/${section}/index.json`);
-      const files = await res.json();
+      try {
+        const res = await fetch(`content/comic/${section}/index.json`);
+        if (!res.ok) throw new Error('找不到 index.json');
 
-      document.getElementById('list').innerHTML = files.map(file => `
-        <p>
-          <a href="comic-detail.html?section=${section}&file=${file}">
-            ${file}
-          </a>
-        </p>
-      `).join('');
+        const files = await res.json();
+
+        if (!files.length) {
+          listBox.innerHTML = '<div class="empty">这个系列还没有内容。</div>';
+          return;
+        }
+
+        listBox.innerHTML = files.map((file, index) => {
+          const number = String(index + 1).padStart(3, '0');
+
+          return `
+            <a class="item" href="comic-detail.html?section=${section}&file=${file}">
+              <div class="item-title">第 ${number} 话</div>
+              <div class="item-desc">${file}</div>
+            </a>
+          `;
+        }).join('');
+
+      } catch (err) {
+        listBox.innerHTML = `
+          <div class="empty">
+            读取失败。<br>
+            请检查 content/comic/${section}/index.json
+          </div>
+        `;
+      }
     }
 
     loadList();
