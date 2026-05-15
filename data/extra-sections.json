@@ -1,8 +1,14 @@
 [
     {
       "id": "2026-05-10",
-      "title": "番外｜日常掉落",
+      "title": "番外｜超人",
       "desc": "一些不定期的小片段",
       "cover": "content/extra/2026-05-10/images/cover.png"
-    }
+    },
+    {
+    "id": "2026-05-15",
+    "title": "番外｜颠倒世界",
+    "desc": "一些不定期的小片段",
+    "cover": "content/extra/2026-05-15/images/cover.png"
+  }
   ]
