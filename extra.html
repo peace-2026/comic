@@ -6,12 +6,7 @@
   <title>番外 - 星球漫画</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     :root {
       --bg-color: #FDF7E8;
@@ -19,7 +14,6 @@
       --text-main: #3A4A35;
       --text-sub: #7A8B74;
       --text-desc: #9B988A;
-      --icon-bg: #FFF2D1;
       --shadow-soft: 0 8px 24px rgba(138, 154, 134, 0.12);
       --border-soft: rgba(138, 154, 134, 0.14);
     }
@@ -33,100 +27,16 @@
       position: relative;
     }
 
-    .decorations {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .deco-item {
-      position: absolute;
-      animation: float-deco 6s ease-in-out infinite;
-    }
-
-    @keyframes float-deco {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(2deg); }
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      background-color: #FFDE8A;
-      border-radius: 50%;
-      opacity: 0.6;
-    }
-
-    .dot-1 { top: 12%; right: 15%; }
-
-    .dot-2 {
-      top: 40%;
-      left: 10%;
-      background-color: #C6D7BD;
-      width: 6px;
-      height: 6px;
-      animation-delay: 1s;
-    }
-
-    .cross {
-      width: 12px;
-      height: 12px;
-      opacity: 0.5;
-      top: 70%;
-      right: 12%;
-      animation-delay: 0.5s;
-    }
-
-    .cross::before,
-    .cross::after {
-      content: '';
-      position: absolute;
-      background-color: #E2AD88;
-    }
-
-    .cross::before {
-      top: 5px;
-      left: 0;
-      width: 12px;
-      height: 2px;
-    }
-
-    .cross::after {
-      top: 0;
-      left: 5px;
-      width: 2px;
-      height: 12px;
-    }
-
-    @keyframes slideUpFade {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     .page {
       width: 100%;
       max-width: 420px;
       min-height: 100vh;
       margin: 0 auto;
       padding: 28px 20px 48px;
-      position: relative;
-      z-index: 10;
-      animation: slideUpFade 0.8s ease forwards;
     }
 
     .back {
       display: inline-flex;
-      align-items: center;
-      gap: 4px;
       color: var(--text-sub);
       text-decoration: none;
       font-size: 14px;
@@ -141,8 +51,6 @@
     h1 {
       font-size: 32px;
       font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: 1px;
       margin-bottom: 10px;
     }
 
@@ -165,22 +73,22 @@
 
     .section-title::before,
     .section-title::after {
-      content: '✦';
+      content: "✦";
       font-size: 10px;
       color: #D3DABF;
     }
 
-    .list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
     }
 
-    .item {
+    .card {
       display: flex;
       gap: 14px;
       align-items: center;
-      background-color: var(--card-bg);
+      background: var(--card-bg);
       border: 1px solid var(--border-soft);
       border-radius: 24px;
       padding: 16px;
@@ -190,145 +98,94 @@
       transition: all 0.25s ease;
     }
 
-    .item:active {
+    .card:active {
       transform: scale(0.98);
       opacity: 0.86;
     }
 
-    .item-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #FFF2D1, #E8F0E1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .cover {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      object-fit: cover;
       flex-shrink: 0;
-      color: var(--text-main);
+      background: linear-gradient(135deg, #E8F0E1, #FFF2D1);
     }
 
-    .item-icon svg {
-      width: 24px;
-      height: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .item-body {
+    .card-body {
       min-width: 0;
       flex: 1;
     }
 
-    .item-title {
+    .card-title {
       font-size: 17px;
       font-weight: 700;
-      color: var(--text-main);
       margin-bottom: 6px;
       line-height: 1.4;
     }
 
-    .item-date {
+    .card-desc {
       font-size: 13px;
       color: var(--text-desc);
+      line-height: 1.6;
     }
 
     .empty {
       color: var(--text-desc);
       padding: 24px;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255,255,255,.75);
       border-radius: 20px;
       text-align: center;
       box-shadow: var(--shadow-soft);
       line-height: 1.7;
     }
-
-    @media (min-width: 421px) {
-      .page {
-        padding-top: 40px;
-      }
-
-      .item:hover {
-        transform: translateY(-3px);
-      }
-    }
   </style>
 </head>
 
 <body>
-  <div class="decorations">
-    <div class="deco-item dot dot-1"></div>
-    <div class="deco-item dot dot-2"></div>
-    <div class="deco-item cross"></div>
-  </div>
-
   <main class="page">
     <a class="back" href="index.html">← 返回首页</a>
 
     <header class="page-header">
       <h1>番外</h1>
-      <div class="desc">不定期掉落的小片段、小故事和小心情。</div>
+      <div class="desc">不定期掉落的小片段。</div>
     </header>
 
-    <div class="section-title">最近更新</div>
+    <div class="section-title"></div>
 
-    <section class="list" id="extraList"></section>
+    <section class="grid" id="extraGrid"></section>
   </main>
 
   <script>
-    function getTitleFromMarkdown(text, fallback) {
-      const match = text.match(/^#\\s+(.+)$/m);
-      return match ? match[1].trim() : fallback.replace('.md', '');
-    }
-
     async function loadExtras() {
-      const listBox = document.getElementById('extraList');
+      const grid = document.getElementById("extraGrid");
 
       try {
-        const res = await fetch('content/extra/index.json');
-        if (!res.ok) throw new Error('找不到 extra/index.json');
+        const res = await fetch("data/extra-sections.json");
+        if (!res.ok) throw new Error("找不到 extra-sections.json");
 
-        const files = await res.json();
+        const list = await res.json();
 
-        if (!files.length) {
-          listBox.innerHTML = '<div class="empty">还没有番外。</div>';
+        if (!list.length) {
+          grid.innerHTML = '<div class="empty">还没有番外系列。</div>';
           return;
         }
 
-        const items = await Promise.all(files.map(async file => {
-          const mdRes = await fetch(`content/extra/${file}`);
-          const mdText = mdRes.ok ? await mdRes.text() : '';
-          const title = getTitleFromMarkdown(mdText, file);
-          const date = file.replace('.md', '');
-
-          return { file, title, date };
-        }));
-
-        listBox.innerHTML = items.map(item => `
-          <a class="item" href="extra-detail.html?file=${encodeURIComponent(item.file)}">
-            <div class="item-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3v18"></path>
-                <path d="M3 12h18"></path>
-                <path d="m5 5 14 14"></path>
-                <path d="m19 5-14 14"></path>
-              </svg>
-            </div>
-
-            <div class="item-body">
-              <div class="item-title">${item.title}</div>
-              <div class="item-date">${item.date}</div>
+        grid.innerHTML = list.map(item => `
+          <a class="card" href="extra-section.html?id=${item.id}">
+            <img class="cover" src="${item.cover || "assets/images/default-cover.png"}" alt="${item.title}">
+            <div class="card-body">
+              <div class="card-title">${item.title}</div>
+              <div class="card-desc">${item.desc || ""}</div>
             </div>
           </a>
-        `).join('');
+        `).join("");
 
       } catch (err) {
-        listBox.innerHTML = `
+        grid.innerHTML = `
           <div class="empty">
             没有读取到番外目录。<br>
-            请检查 content/extra/index.json
+            请检查 data/extra-sections.json
           </div>
         `;
       }
