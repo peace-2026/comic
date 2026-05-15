@@ -214,7 +214,7 @@
             this.data.sectionId = urlParams.get('section') || 'default-section';
             const file = urlParams.get('file') || '001.md';
 
-            this.elements.backLink.href = `comic-section.html?id=${this.data.sectionId}`;
+            this.elements.backLink.href = `comic.html`;
 
             const targetUrl = `content/comic/${this.data.sectionId}/${file}`;
 
@@ -290,8 +290,10 @@
             if (nextIndex >= 0 && nextIndex < this.data.pages.length) {
                 this.renderPage(nextIndex);
             } else if (nextIndex === this.data.pages.length) {
-                window.location.href = this.elements.backLink.href;
-            }
+
+window.location.href = 'comic.html';
+
+}
         },
 
         hideLoading() {
