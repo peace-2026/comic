@@ -33,6 +33,8 @@
       min-height: 100vh;
       margin: 0 auto;
       padding: 28px 20px 48px;
+      display: flex;
+      flex-direction: column;
     }
 
     .back {
@@ -139,6 +141,15 @@
       box-shadow: var(--shadow-soft);
       line-height: 1.7;
     }
+
+    .copyright {
+      margin-top: auto;
+      padding-top: 36px;
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: center;
+      color: var(--text-sub);
+    }
   </style>
 </head>
 
@@ -154,26 +165,31 @@
     <div class="section-title"></div>
 
     <section class="grid" id="extraGrid"></section>
+
+    <p class="copyright">
+      本漫画作品版权归图中 Q 版人物本人所有，未经本人授权，任何人不得用于商业用途。
+    </p>
   </main>
 
   <script>
     async function openFirstExtra(sectionId) {
-  try {
-    const res = await fetch(`content/extra/${sectionId}/index.json`);
-    if (!res.ok) throw new Error("找不到 index.json");
+      try {
+        const res = await fetch(`content/extra/${sectionId}/index.json`);
+        if (!res.ok) throw new Error("找不到 index.json");
 
-    const files = await res.json();
+        const files = await res.json();
 
-    if (!files.length) {
-      alert("这个番外系列还没有内容");
-      return;
+        if (!files.length) {
+          alert("这个番外系列还没有内容");
+          return;
+        }
+
+        window.location.href = `extra-detail.html?section=${sectionId}&file=${files[0]}`;
+      } catch (err) {
+        alert("没有读取到这个番外系列");
+      }
     }
 
-    window.location.href = `extra-detail.html?section=${sectionId}&file=${files[0]}`;
-  } catch (err) {
-    alert("没有读取到这个番外系列");
-  }
-}
     async function loadExtras() {
       const grid = document.getElementById("extraGrid");
 
@@ -189,7 +205,7 @@
         }
 
         grid.innerHTML = list.map(item => `
-         <a class="card" href="javascript:void(0)" onclick="openFirstExtra('${item.id}')">
+          <a class="card" href="javascript:void(0)" onclick="openFirstExtra('${item.id}')">
             <img class="cover" src="${item.cover || "assets/images/default-cover.png"}" alt="${item.title}">
             <div class="card-body">
               <div class="card-title">${item.title}</div>
